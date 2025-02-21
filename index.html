@@ -64,6 +64,17 @@
       font-family: Arial, sans-serif;
       z-index: 3;
     }
+
+    /* Responsive adjustments */
+    @media screen and (max-width: 768px) {
+      .game-container {
+        height: 400px;
+      }
+      .car {
+        width: 40px;
+        height: 80px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -96,7 +107,7 @@
   // Play sound when the game starts
   startSound.play();
 
-  // Move car on left/right arrow key presses
+  // Move car on left/right arrow key presses (Desktop)
   function moveCar(e) {
     const carWidth = car.offsetWidth;
     const gameWidth = gameArea.offsetWidth;
@@ -104,6 +115,26 @@
       carLeft = Math.max(0, carLeft - 40);  // Faster movement to the left
     } else if (e.key === 'ArrowRight') {
       carLeft = Math.min(gameWidth - carWidth, carLeft + 40);  // Faster movement to the right
+    }
+    car.style.left = carLeft + 'px';
+  }
+
+  // Mobile touch controls
+  let touchStartX = 0;
+  let touchMoveX = 0;
+  function handleTouchStart(e) {
+    touchStartX = e.touches[0].clientX;
+  }
+  function handleTouchMove(e) {
+    touchMoveX = e.touches[0].clientX;
+    const moveDistance = touchMoveX - touchStartX;
+    const carWidth = car.offsetWidth;
+    const gameWidth = gameArea.offsetWidth;
+
+    if (moveDistance > 0) {
+      carLeft = Math.min(gameWidth - carWidth, carLeft + 10);  // Swipe right
+    } else if (moveDistance < 0) {
+      carLeft = Math.max(0, carLeft - 10);  // Swipe left
     }
     car.style.left = carLeft + 'px';
   }
@@ -160,6 +191,10 @@
 
   // Listen to keyboard events for car movement
   document.addEventListener('keydown', moveCar);
+
+  // Listen to touch events for mobile movement
+  gameArea.addEventListener('touchstart', handleTouchStart);
+  gameArea.addEventListener('touchmove', handleTouchMove);
 
   // Start generating obstacles
   generateObstacle();
